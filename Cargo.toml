@@ -1,0 +1,11 @@
+[package]
+name = "nn_util_api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+warp = "0.3"
+rust-bert = { version = "0.21.0", features = ["download-libtorch"] }
+serde = { version = "1.0", features = ["derive"] }
+lazy_static = "1.4"
