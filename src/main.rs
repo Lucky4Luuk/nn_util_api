@@ -7,7 +7,7 @@ mod sentiment_analysis;
 async fn main() {
     // GET /ping/
     let ping = warp::path!("ping" / String)
-        .map(|name| "Pong!");
+        .map(|| "Pong!");
 
     let routes = ping
         .or(named_entity_recognition::get_route())
