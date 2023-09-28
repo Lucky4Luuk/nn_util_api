@@ -6,7 +6,7 @@ mod sentiment_analysis;
 #[tokio::main]
 async fn main() {
     // GET /ping/
-    let ping = warp::path!("ping" / String)
+    let ping = warp::path!("ping")
         .map(|| "Pong!");
 
     let routes = ping
