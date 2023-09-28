@@ -1,7 +1,7 @@
 use warp::Filter;
 use serde::Deserialize;
 
-use rust_bert::pipelines::sentiment::SentimentModel;
+use rust_bert::pipelines::sentiment::{SentimentModel, SentimentPolarity};
 
 thread_local! {
     static MODEL: SentimentModel = SentimentModel::new(Default::default()).expect("Failed to load model!");
@@ -23,8 +23,7 @@ pub fn get_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> 
             println!("data: {:#?}", data);
             MODEL.with(|model| {
                 let output = model.predict(&data.input.iter().map(|s| s.as_str()).collect::<Vec<&str>>());
-                println!("output: {:?}", output);
-                "hello!".to_string()
+                serde_json::to_string(&output.into_iter().map(|sentiment| sentiment.score * (if sentiment.polarity == SentimentPolarity::Negative { -1.0 } else { 1.0 })).collect::<Vec<f64>>()).unwrap()
             })
         })
 }

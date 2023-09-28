@@ -938,6 +938,7 @@ dependencies = [
  "lazy_static",
  "rust-bert",
  "serde",
+ "serde_json",
  "tokio",
  "warp",
 ]

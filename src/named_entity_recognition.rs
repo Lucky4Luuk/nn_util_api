@@ -1,5 +1,5 @@
 use warp::Filter;
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 use rust_bert::pipelines::ner::NERModel;
 
@@ -10,6 +10,14 @@ thread_local! {
 #[derive(Deserialize, Debug)]
 struct NERInput {
     input: Vec<String>,
+}
+
+#[derive(Serialize)]
+struct NEROutput {
+    word: String,
+    score: f64,
+    label: String,
+    offset: (u32, u32),
 }
 
 pub fn get_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> + Clone {
@@ -23,8 +31,12 @@ pub fn get_route() -> impl Filter<Extract = (String,), Error = warp::Rejection> 
             println!("data: {:#?}", data);
             MODEL.with(|ner_model| {
                 let output = ner_model.predict(&data.input);
-                println!("output: {:?}", output);
-                "hello!".to_string()
+                serde_json::to_string(&output.into_iter().map(|v| v.into_iter().map(|entity| NEROutput {
+                    word: entity.word,
+                    score: entity.score,
+                    label: entity.label,
+                    offset: (entity.offset.begin, entity.offset.end),
+                }).collect::<Vec<NEROutput>>()).collect::<Vec<Vec<NEROutput>>>()).unwrap()
             })
         })
 }
